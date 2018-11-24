@@ -1,55 +1,89 @@
-# coding: utf-8
-
 from sys import stdin
 
 import ast
 import tokenize
 
 
-__version__ = '0.3'
+__version__ = '0.4'
 
-NON_EXISTENT_METHODS = [
+# Method calls which are missing assert_ prefix
+NON_EXISTENT_METHOD_CALLS = [
     'assert_calls',
-    'not_called',
     'called_once',
+    'called_with',
     'called_once_with',
+    'has_calls',
+    'not_called',
 ]
-MOCK_ERROR_CODE = 'M001'
-ERROR_MESSAGE = "%s %s is a non-existent mock method."
+# Properties which don't exist on mocks
+NON_EXISTENT_ASSERTS = [
+    'called_once',
+    'not_called',
+]
+
+MESSAGE_M200 = "M200 {} is a non-existent mock method"
+MESSAGE_M201 = "M201 {} is a non-existent mock property"
 
 
-def get_noqa_lines(code):
-    tokens = tokenize.generate_tokens(lambda L=iter(code): next(L))
-    noqa = [token[2][0] for token in tokens if token[0] == tokenize.COMMENT
-            and (token[1].endswith('noqa') or (isinstance(token[0], str) and
-                                               token[0].endswith('noqa')))]
-    return noqa
-
-
-class MockChecker(object):
+class MockChecker:
     name = 'flake8-mock'
     version = __version__
 
-    def __init__(self, tree, filename='(none)', builtins=None):
+    def __init__(self, tree, *args, **kwargs):
         self.tree = tree
-        self.filename = (filename == 'stdin' and stdin) or filename
-        self.errors = []
 
     def run(self):
-        with open(self.filename, 'r') as file_to_check:
-            node_ast = file_to_check.read()
-            self.noqa_lines = get_noqa_lines(node_ast)
-        module = ast.parse(node_ast)
-        walking = ast.walk(module)
-        for node in walking:
-            if isinstance(node, ast.Expr) and isinstance(node.value, ast.Call):
-                if (node.lineno not in self.noqa_lines) and \
-                   hasattr(node.value.func, 'attr') and \
-                   node.value.func.attr in NON_EXISTENT_METHODS:
-                    self.errors.append({
-                        "message": ERROR_MESSAGE % (
-                            MOCK_ERROR_CODE, node.value.func.attr),
-                        "line": node.lineno,
-                    })
-        for error in self.errors:
-            yield (error.get("line"), 0, error.get("message"), type(self))
+        checks = (self.check_M200, self.check_M201)
+        for node in ast.walk(self.tree):
+            for check in checks:
+                errors = check(node)
+                if not errors:
+                    continue
+
+                for error in errors:
+                    yield error
+
+    def check_M200(self, node):
+        """Check for mock functions which are not asserts.
+
+        We want to check for functions which look like mock asserts at first
+        glance, but ate not really testing anything e.g.
+        some_mock.called_once() should be some_mock.assert_called_once()
+        """
+        if not isinstance(node, ast.Expr):
+            return
+
+        if not isinstance(node.value, ast.Call):
+            return
+
+        if not isinstance(node.value.func, ast.Attribute):
+            return
+
+        if node.value.func.attr in NON_EXISTENT_METHOD_CALLS:
+            yield (
+                node.lineno,
+                node.col_offset,
+                MESSAGE_M200.format(node.value.func.attr),
+                type(self)
+            )
+
+    def check_M201(self, node):
+        """Check for asserts checking attributes which don't exist.
+
+        We want to check if there are no asserts which can look properly
+        but don't actually test anything e.g.
+        some_mock.assert_once - this is not a boolean attribute
+        """
+        if not isinstance(node, ast.Assert):
+            return
+
+        if not isinstance(node.test, ast.Attribute):
+            return
+
+        if node.test.attr in NON_EXISTENT_ASSERTS:
+            yield (
+                node.lineno,
+                node.col_offset,
+                MESSAGE_M201.format(node.test.attr),
+                type(self)
+            )
