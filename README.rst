@@ -25,23 +25,14 @@ You can install or upgrade ``flake8-mock`` with these commands::
   $ pip install --upgrade flake8-mock
 
 
-List of non-existent methods checked
-------------------------------------
-
-    * ``assert_calls``
-    * ``not_called``
-    * ``called_once``
-    * ``called_once_with``
-
-
 Plugin for Flake8
 -----------------
 
-When both ``flake8 2.4`` and ``flake8-mock`` are installed, the plugin is
+When both ``flake8 3.5.0`` and ``flake8-mock`` are installed, the plugin is
 available in ``flake8``::
 
     $ flake8 --version
-    2.4.1 (pep8: 1.5.7, flake8-mock: 0.3, pyflakes: 0.8.1)
+    3.5.0 (flake8-mock: 0.4, pyflakes: 0.8.1)
 
 
 Example output
@@ -50,25 +41,25 @@ Example output
 Once you run flake8, you can have something like::
 
     $ flake8 test_file.py
-    test_file.py:27:1: M001 assert_calls is a non-existent mock method.
-    test_file.py:28:1: M001 called_once_with is a non-existent mock method.
-    test_file.py:39:1: M001 not_called is a non-existent mock method.
-    test_file.py:40:1: M001 assert_called is a non-existent mock method.
+    test_file.py:55:5: M201 called_once is a non-existent mock property
+    test_file.py:56:5: M200 called_once_with is a non-existent mock method
 
 Credits
 -------
-    * Alejandro Gabriel Pereira is the main author.
-    * Nejc Zupan (`NiteoWeb Ltd. <http://www.niteoweb.com>`_) provided the idea
-      and proof-reading.
-
-Collaborators
--------------
-    * `John Vandenberg <https://github.com/jayvdb>`_
-    * `Tom Prince <https://github.com/tomprince>`_
+    * Alejandro Gabriel Pereira is the original author.
+    * Ania Warzecha has rewritten it for flake8 3 and with support for more methods
 
 
 Changes
 -------
+
+0.4 (24-11-2018)
+````````````````
+* Added `has_calls` to checked methods
+* Added a check for not existent properties on mocks
+* Added compatibility for flake8 3.x
+* Added tests
+
 
 0.3 (09-10-2016)
 ````````````````
