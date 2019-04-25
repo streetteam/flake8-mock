@@ -1,7 +1,4 @@
-from sys import stdin
-
 import ast
-import tokenize
 
 
 __version__ = '0.4'

@@ -53,8 +53,9 @@ Credits
 Changes
 -------
 
-0.4 (24-11-2018)
+0.4 (25-04-2019)
 ````````````````
+* Forked by Verve to `verve-flake8-mock`
 * Added `has_calls` to checked methods
 * Added a check for not existent properties on mocks
 * Added compatibility for flake8 3.x

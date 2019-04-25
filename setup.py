@@ -21,7 +21,7 @@ def get_long_description():
 
 
 setup(
-    name='flake8-mock',
+    name='verve-flake8-mock',
     version=get_version(),
     description="Provides checking for non-existent mock methods and properties",
     long_description=get_long_description(),
