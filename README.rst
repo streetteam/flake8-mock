@@ -19,20 +19,20 @@ Inspired by http://engineeringblog.yelp.com/2015/02/assert_called_once-threat-or
 Installation
 ------------
 
-You can install or upgrade ``flake8-mock`` with these commands::
+You can install or upgrade ``verve-flake8-mock`` with these commands::
 
-  $ pip install flake8-mock
-  $ pip install --upgrade flake8-mock
+  $ pip install verve-flake8-mock
+  $ pip install --upgrade verve-flake8-mock
 
 
 Plugin for Flake8
 -----------------
 
-When both ``flake8 3.5.0`` and ``flake8-mock`` are installed, the plugin is
+When both ``flake8 3.5.0`` and ``verve-flake8-mock`` are installed, the plugin is
 available in ``flake8``::
 
     $ flake8 --version
-    3.5.0 (flake8-mock: 0.4, pyflakes: 0.8.1)
+    3.5.0 (verve-flake8-mock: 0.4, pyflakes: 0.8.1)
 
 
 Example output
