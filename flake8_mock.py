@@ -23,7 +23,7 @@ MESSAGE_M201 = "M201 {} is a non-existent mock property"
 
 
 class MockChecker:
-    name = 'flake8-mock'
+    name = 'verve-flake8-mock'
     version = __version__
 
     def __init__(self, tree, *args, **kwargs):
